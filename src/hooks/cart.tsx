@@ -55,7 +55,7 @@ const CartProvider: React.FC = ({ children }) => {
         setProducts(updatedProducts);
       } else {
         const addedProduct = product;
-        addedProduct.quantity = 0;
+        addedProduct.quantity = 1;
 
         setProducts([...products, addedProduct]);
       }
@@ -74,17 +74,33 @@ const CartProvider: React.FC = ({ children }) => {
         currentProduct => currentProduct.id === id,
       );
 
-      const draftProducts = products;
+      const draftProducts = [...products];
       draftProducts[productIndex].quantity += 1;
 
-      setProducts(products);
+      setProducts(draftProducts);
     },
     [products],
   );
 
-  const decrement = useCallback(async id => {
-    // TODO DECREMENTS A PRODUCT QUANTITY IN THE CART
-  }, []);
+  const decrement = useCallback(
+    async id => {
+      const productIndex = products.findIndex(
+        currentProduct => currentProduct.id === id,
+      );
+
+      const draftProducts = [...products];
+      const amount = draftProducts[productIndex].quantity;
+
+      if (amount > 1) {
+        draftProducts[productIndex].quantity -= 1;
+      } else {
+        draftProducts.splice(productIndex, 1);
+      }
+
+      setProducts(draftProducts);
+    },
+    [products],
+  );
 
   const value = React.useMemo(
     () => ({ addToCart, increment, decrement, products }),
